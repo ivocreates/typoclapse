@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # 🚀 Typoclapse – Typing Game for TechFest 🧠⌨️
 
 **Typoclapse** is an engaging, web-based typing competition game designed for a college tech fest. It challenges users to type a given prompt with speed and precision, tracking both typing speed and accuracy to calculate a real-time score. Built with **HTML**, **CSS**, **JavaScript**, and **Firebase**, it offers a seamless user experience through a dual-panel system: **User Panel** and **Admin Panel**.
@@ -132,4 +131,4 @@ You can also reach out through our website: ivocreates.site/contact
 =======
 # typoclapse
 Typoclapse is a web-based typing game developed using HTML, CSS, JavaScript, and Firebase. It calculates scores based on typing speed and accuracy. The game features two panels: a user panel for gameplay, where participants authenticate with OTP and play once, and an admin panel for participant registration and leaderboard management.
->>>>>>> ab63d8d21e4f0e95432b5fecb795ba895a6a083c
+
