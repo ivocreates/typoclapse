@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TechFest-SPK</title>
+  <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+  <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+  <script type="module" src="firebase-config.js"></script>
+</head>
+<body>
+  <div class="container mt-5">
+    <h1 class="text-center">Welcome to TechFest-SPK</h1>
+    <p class="text-center">Explore the events and track participation!</p>
+
+    <!-- Event Cards Section -->
+    <div class="row mt-4" id="event-cards">
+      <!-- Event cards will be dynamically generated here -->
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD55uYtn0ntgrC-iaO34ebEBGd_lvSO-9I",
+      authDomain: "my-porfolio-51864.firebaseapp.com",
+      databaseURL: "https://my-porfolio-51864-default-rtdb.firebaseio.com",
+      projectId: "my-porfolio-51864",
+      storageBucket: "my-porfolio-51864.firebasestorage.app",
+      messagingSenderId: "316880480532",
+      appId: "1:316880480532:web:b02ea850c907a5d3ae7a01",
+      measurementId: "G-9GVEZT7XWY"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const events = [
+      "BGMI",
+      "Mobile App Development",
+      "Techventure Quest",
+      "Hactivate: Capture the Flag",
+      "Quiz Competition",
+      "Web Development",
+      "Typoclapse",
+      "Reel Making",
+      "MySQL Mastermind"
+    ];
+
+    // Fetch event data from Firebase
+    async function loadEventData() {
+      const eventCards = document.getElementById("event-cards");
+      eventCards.innerHTML = ""; // Clear existing cards
+
+      for (const event of events) {
+        // Get total participants and ranks for each event
+        const querySnapshot = await getDocs(collection(db, "registrations"));
+        let totalParticipants = 0;
+        let ranks = [];
+
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          if (data.events.includes(event)) {
+            totalParticipants++;
+          }
+          if (data.eventRanks && data.eventRanks[event]) {
+            ranks = data.eventRanks[event]; // Fetch ranks if available
+          }
+        });
+
+        // Add a card for the event
+        const card = document.createElement("div");
+        card.className = "col-md-4 mb-4";
+        card.innerHTML = `
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title text-center">${event}</h5>
+              <p class="card-text text-center">
+                <strong>Total Participants:</strong> ${totalParticipants}
+              </p>
+              <hr>
+              <h6 class="text-center">Top 3 Ranks</h6>
+              <ul class="list-group text-center">
+                <li class="list-group-item">${ranks[0] || "1st Rank: Placeholder"}</li>
+                <li class="list-group-item">${ranks[1] || "2nd Rank: Placeholder"}</li>
+                <li class="list-group-item">${ranks[2] || "3rd Rank: Placeholder"}</li>
+              </ul>
+            </div>
+          </div>
+        `;
+        eventCards.appendChild(card);
+      }
+    }
+
+    // Load event data on page load
+    loadEventData();
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+</body>
+</html>

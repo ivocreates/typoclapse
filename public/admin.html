@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - TechFest-SPK</title>
+  <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+  <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+  <script type="module" src="firebase-config.js"></script>
+</head>
+<body>
+  <div class="container mt-5">
+    <h1 class="text-center">Admin Dashboard</h1>
+    <!-- Student Records Section -->
+    <section class="mt-5">
+        <h2>Student Records</h2>
+        <div class="d-flex justify-content-between mb-3">
+          <div>
+            <label for="event-filter" class="form-label">Filter by Event</label>
+            <select id="event-filter" class="form-select">
+              <option value="">All Events</option>
+              <option value="BGMI">BGMI</option>
+              <option value="Mobile App Development">Mobile App Development</option>
+              <option value="Techventure Quest">Techventure Quest</option>
+              <option value="Hactivate: Capture the Flag">Hactivate</option>
+              <option value="Quiz Competition">Quiz Competition</option>
+              <option value="Web Development">Web Development</option>
+              <option value="Typoclapse">Typoclapse</option>
+              <option value="Reel Making">Reel Making</option>
+              <option value="MySQL Mastermind">MySQL Mastermind</option>
+            </select>
+          </div>
+          <button id="export-filtered-btn" class="btn btn-success">Export Filtered Data to Excel</button>
+        </div>
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>Registration ID</th>
+              <th>Student Name</th>
+              <th>College Name</th>
+              <th>Contact</th>
+              <th>Events</th>
+              <th>Payment Status</th>
+              <th>Attendance</th>
+            </tr>
+          </thead>
+          <tbody id="students-table"></tbody>
+        </table>
+      </section>
+
+    <!-- Assign Coordinators -->
+    <section class="mt-5">
+      <h2>Assign Coordinators</h2>
+      <form id="assign-coordinator-form">
+        <div class="mb-3">
+          <label for="coordinator-name" class="form-label">Coordinator Name</label>
+          <input type="text" id="coordinator-name" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label for="coordinator-email" class="form-label">Coordinator Email</label>
+          <input type="email" id="coordinator-email" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label for="coordinator-password" class="form-label">Password</label>
+          <input type="password" id="coordinator-password" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label for="coordinator-event" class="form-label">Assign Event</label>
+          <select id="coordinator-event" class="form-select">
+            <option value="">Select Event</option>
+            <option value="BGMI">BGMI</option>
+            <option value="Mobile App Development">Mobile App Development</option>
+            <option value="Techventure Quest">Techventure Quest</option>
+            <option value="Hactivate: Capture the Flag">Hactivate: Capture the Flag</option>
+            <option value="Quiz Competition">Quiz Competition</option>
+            <option value="Web Development">Web Development</option>
+            <option value="Typoclapse">Typoclapse</option>
+            <option value="Reel Making">Reel Making</option>
+            <option value="MySQL Mastermind">MySQL Mastermind</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Assign Coordinator</button>
+      </form>
+    </section>
+
+    <!-- Assign Login Credentials -->
+    <section class="mt-5">
+      <h2>Assign Login Credentials</h2>
+      <form id="assign-login-form">
+        <div class="mb-3">
+          <label for="role" class="form-label">Select Role</label>
+          <select id="role" class="form-select">
+            <option value="RegistrationAuthority">Registration Authority</option>
+            <option value="HeadRegistration">Head Registration</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input type="email" id="email" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label for="password" class="form-label">Password</label>
+          <input type="password" id="password" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Assign Login</button>
+      </form>
+    </section>
+  </div>
+  <section class="mt-5">
+    <h2>Manage Coordinators & Roles</h2>
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Role</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Assigned Event</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="roles-table">
+        <!-- Data will be dynamically loaded here -->
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Input Ranks -->
+  <section class="mt-5">
+    <h2>Input Event Ranks</h2>
+    <form id="rank-form">
+      <div class="mb-3">
+        <label for="event-rank" class="form-label">Event</label>
+        <select id="event-rank" class="form-select" required>
+          <option value="">Select Event</option>
+          <option value="BGMI">BGMI</option>
+          <option value="Mobile App Development">Mobile App Development</option>
+          <!-- Add other events as needed -->
+        </select>
+      </div>
+      <div class="mb-3">
+        <label for="rank-data" class="form-label">Ranks (Enter in JSON format)</label>
+        <textarea id="rank-data" class="form-control" placeholder='Example: {"1st":"Team A", "2nd":"Team B"}' required></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary w-100">Submit Ranks</button>
+    </form>
+  </section>
+</div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, addDoc, query, updateDoc, doc } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD55uYtn0ntgrC-iaO34ebEBGd_lvSO-9I",
+      authDomain: "my-porfolio-51864.firebaseapp.com",
+      databaseURL: "https://my-porfolio-51864-default-rtdb.firebaseio.com",
+      projectId: "my-porfolio-51864",
+      storageBucket: "my-porfolio-51864.firebasestorage.app",
+      messagingSenderId: "316880480532",
+      appId: "1:316880480532:web:b02ea850c907a5d3ae7a01",
+      measurementId: "G-9GVEZT7XWY"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Load Student Records
+    async function loadStudents(eventFilter = "") {
+      const studentsTable = document.getElementById("students-table");
+      studentsTable.innerHTML = "";
+
+      const querySnapshot = await getDocs(collection(db, "registrations"));
+      querySnapshot.forEach((doc) => {
+        const student = doc.data();
+        if (eventFilter && !student.events.includes(eventFilter)) return;
+
+        const row = `
+          <tr>
+            <td>${student.registrationId}</td>
+            <td>${student.studentName}</td>
+            <td>${student.collegeName}</td>
+            <td>${student.contactNumber}</td>
+            <td>${student.events.join(", ")}</td>
+            <td>${student.feesPaid}</td>
+            <td>${student.attendance || "N/A"}</td>
+          </tr>
+        `;
+        studentsTable.innerHTML += row;
+      });
+    }
+
+ // Load Assigned Roles
+async function loadRoles() {
+  const rolesTable = document.getElementById("roles-table");
+  rolesTable.innerHTML = ""; // Clear existing rows before adding new ones
+
+  try {
+    const querySnapshot = await getDocs(collection(db, "roles"));
+    
+    if (querySnapshot.empty) {
+      console.log("No roles found.");
+      rolesTable.innerHTML = "<tr><td colspan='5'>No roles found</td></tr>";
+      return;
+    }
+
+    querySnapshot.forEach((doc) => {
+      const role = doc.data();
+
+      const row = `
+        <tr>
+          <td>${role.role}</td>
+          <td>${role.name}</td>
+          <td>${role.email}</td>
+          <td>${role.event || "N/A"}</td>
+          <td>
+            <button class="btn btn-warning btn-sm" onclick="updateRole('${doc.id}')">Edit</button>
+          </td>
+        </tr>
+      `;
+      rolesTable.innerHTML += row;
+    });
+  } catch (error) {
+    console.error("Error loading roles:", error);
+    rolesTable.innerHTML = "<tr><td colspan='5'>Failed to load roles</td></tr>";
+  }
+}
+
+
+    // Submit Ranks
+    document.getElementById("rank-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const event = document.getElementById("event-rank").value;
+      const rankData = JSON.parse(document.getElementById("rank-data").value);
+
+      await addDoc(collection(db, "ranks"), { event, rankData });
+      alert("Ranks added successfully!");
+      e.target.reset();
+    });
+
+    // Filter Export
+    document.getElementById("export-filtered-btn").addEventListener("click", () => {
+      const tableHtml = document.querySelector("table").outerHTML.replace(/ /g, "%20");
+      const filename = "filtered_data.xls";
+
+      const link = document.createElement("a");
+      link.href = "data:application/vnd.ms-excel," + tableHtml;
+      link.download = filename;
+      link.click();
+    });
+
+    // Load data on page load
+    document.getElementById("event-filter").addEventListener("change", (e) => {
+      loadStudents(e.target.value);
+    });
+    loadStudents();
+    loadRoles();
+
+    // Assign Coordinator
+    document.getElementById("assign-coordinator-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById("coordinator-name").value;
+      const email = document.getElementById("coordinator-email").value;
+      const password = document.getElementById("coordinator-password").value;
+      const event = document.getElementById("coordinator-event").value;
+
+      if (!event) {
+        alert("Please select an event!");
+        return;
+      }
+
+      await addDoc(collection(db, "coordinators"), { name, email, password, event });
+      alert("Coordinator assigned successfully!");
+      e.target.reset();
+    });
+
+    // Assign Login Credentials
+    document.getElementById("assign-login-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const role = document.getElementById("role").value;
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      await addDoc(collection(db, "logins"), { role, email, password });
+      alert("Login credentials assigned successfully!");
+      e.target.reset();
+    });
+
+    // Export student data to Excel
+    document.getElementById("export-students-btn").addEventListener("click", () => {
+      const table = document.querySelector("table");
+      const tableHtml = table.outerHTML.replace(/ /g, "%20");
+      const filename = "student_data.xls";
+
+      const downloadLink = document.createElement("a");
+      downloadLink.href = "data:application/vnd.ms-excel," + tableHtml;
+      downloadLink.download = filename;
+      downloadLink.click();
+    });
+
+    // Load students on page load
+    loadStudents();
+  </script>
+  <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+</body>
+</html>

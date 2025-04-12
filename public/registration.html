@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Head Registration - TechFest-SPK</title>
+  <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+  <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+  <script type="module" src="firebase-config.js"></script>
+</head>
+<body>
+  <div class="container mt-5">
+    <h1 class="text-center">Head Registration</h1>
+    <form id="registration-form" class="mt-4">
+      <div class="mb-3">
+        <label for="student-name" class="form-label">Student Name</label>
+        <input type="text" id="student-name" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label for="college-name" class="form-label">College Name</label>
+        <input type="text" id="college-name" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label for="class-name" class="form-label">Class Name</label>
+        <input type="text" id="class-name" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label for="contact-number" class="form-label">Contact Number</label>
+        <input type="text" id="contact-number" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label for="events" class="form-label">Select Events</label>
+        <div id="events">
+          <div>
+            <input type="checkbox" id="bgmi" value="BGMI">
+            <label for="bgmi">BGMI</label>
+            <input type="text" id="bgmi-team" class="form-control mt-1" placeholder="Team Name (optional)" style="display:none;">
+          </div>
+          <div><input type="checkbox" id="mobile-dev" value="Mobile App Development"> <label for="mobile-dev">Mobile App Development</label></div>
+          <div><input type="checkbox" id="techventure" value="Techventure Quest"> <label for="techventure">Techventure Quest</label></div>
+          <div><input type="checkbox" id="hacktivate" value="Hactivate: Capture the Flag"> <label for="hacktivate">Hactivate: Capture the Flag</label></div>
+          <div><input type="checkbox" id="quiz" value="Quiz Competition"> <label for="quiz">Quiz Competition</label></div>
+          <div><input type="checkbox" id="web-dev" value="Web Development"> <label for="web-dev">Web Development</label></div>
+          <div><input type="checkbox" id="typoclapse" value="Typoclapse"> <label for="typoclapse">Typoclapse</label></div>
+          <div><input type="checkbox" id="reel-making" value="Reel Making"> <label for="reel-making">Reel Making</label></div>
+          <div><input type="checkbox" id="mysql-mastermind" value="MySQL Mastermind"> <label for="mysql-mastermind">MySQL Mastermind</label></div>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary w-100">Register</button>
+    </form>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD55uYtn0ntgrC-iaO34ebEBGd_lvSO-9I",
+      authDomain: "my-porfolio-51864.firebaseapp.com",
+      databaseURL: "https://my-porfolio-51864-default-rtdb.firebaseio.com",
+      projectId: "my-porfolio-51864",
+      storageBucket: "my-porfolio-51864.firebasestorage.app",
+      messagingSenderId: "316880480532",
+      appId: "1:316880480532:web:b02ea850c907a5d3ae7a01",
+      measurementId: "G-9GVEZT7XWY"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Handle BGMI Team Name field visibility
+    document.getElementById("bgmi").addEventListener("change", function () {
+      document.getElementById("bgmi-team").style.display = this.checked ? "block" : "none";
+    });
+
+    // Form submission handler
+    const registrationForm = document.getElementById("registration-form");
+    registrationForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const studentName = document.getElementById("student-name").value;
+      const collegeName = document.getElementById("college-name").value;
+      const className = document.getElementById("class-name").value;
+      const contactNumber = document.getElementById("contact-number").value;
+
+      const events = [];
+      const checkboxes = document.querySelectorAll("#events input[type='checkbox']");
+      checkboxes.forEach((checkbox) => {
+        if (checkbox.checked) {
+          if (checkbox.id === "bgmi") {
+            events.push({ event: "BGMI", teamName: document.getElementById("bgmi-team").value || null });
+          } else {
+            events.push(checkbox.value);
+          }
+        }
+      });
+
+      // Auto-generate a unique registration ID
+      const registrationId = `TF-${Date.now().toString().slice(-4)}`;
+
+      try {
+        await addDoc(collection(db, "registrations"), {
+          registrationId,
+          studentName,
+          collegeName,
+          className,
+          contactNumber,
+          events,
+        });
+        alert(`Registration Successful! Registration ID: ${registrationId}`);
+        registrationForm.reset();
+        document.getElementById("bgmi-team").style.display = "none";
+      } catch (error) {
+        console.error("Error adding document: ", error);
+        alert("Registration Failed! Please try again.");
+      }
+    });
+  </script>
+</body>
+</html>

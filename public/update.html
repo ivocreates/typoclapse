@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registration Authority - TechFest-SPK</title>
+  <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+  <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+  <script type="module" src="firebase-config.js"></script>
+</head>
+<body>
+  <div class="container mt-5">
+    <h1 class="text-center">Registration Authority</h1>
+    <div class="mt-4">
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <input type="text" id="search-id" class="form-control" placeholder="Search by Registration ID">
+        </div>
+        <div class="col-md-4">
+          <input type="text" id="search-name" class="form-control" placeholder="Search by Student Name">
+        </div>
+        <div class="col-md-4">
+          <input type="text" id="search-college" class="form-control" placeholder="Search by College Name">
+        </div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <select id="filter-event" class="form-select">
+            <option value="">Filter by Event</option>
+            <option value="BGMI">BGMI</option>
+            <option value="Mobile App Development">Mobile App Development</option>
+            <option value="Techventure Quest">Techventure Quest</option>
+            <option value="Hactivate: Capture the Flag">Hactivate: Capture the Flag</option>
+            <option value="Quiz Competition">Quiz Competition</option>
+            <option value="Web Development">Web Development</option>
+            <option value="Typoclapse">Typoclapse</option>
+            <option value="Reel Making">Reel Making</option>
+            <option value="MySQL Mastermind">MySQL Mastermind</option>
+          </select>
+        </div>
+        <div class="col-md-6 text-end">
+          <button id="export-btn" class="btn btn-success">Export to Excel</button>
+        </div>
+      </div>
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Registration ID</th>
+            <th>Student Name</th>
+            <th>College Name</th>
+            <th>Events</th>
+            <th>Fees Paid</th>
+            <th>Payment Method</th>
+          </tr>
+        </thead>
+        <tbody id="students-table">
+          <!-- Data will be dynamically loaded here -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js";
+    import { getFirestore, collection, query, where, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD55uYtn0ntgrC-iaO34ebEBGd_lvSO-9I",
+      authDomain: "my-porfolio-51864.firebaseapp.com",
+      databaseURL: "https://my-porfolio-51864-default-rtdb.firebaseio.com",
+      projectId: "my-porfolio-51864",
+      storageBucket: "my-porfolio-51864.firebasestorage.app",
+      messagingSenderId: "316880480532",
+      appId: "1:316880480532:web:b02ea850c907a5d3ae7a01",
+      measurementId: "G-9GVEZT7XWY"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Load data and filter functionality
+    async function loadStudents() {
+      const studentsTable = document.getElementById("students-table");
+      studentsTable.innerHTML = ""; // Clear the table
+
+      const searchId = document.getElementById("search-id").value;
+      const searchName = document.getElementById("search-name").value;
+      const searchCollege = document.getElementById("search-college").value;
+      const filterEvent = document.getElementById("filter-event").value;
+
+      let studentsQuery = query(collection(db, "registrations"));
+
+      if (searchId) {
+        studentsQuery = query(studentsQuery, where("registrationId", "==", searchId));
+      }
+      if (searchName) {
+        studentsQuery = query(studentsQuery, where("studentName", "==", searchName));
+      }
+      if (searchCollege) {
+        studentsQuery = query(studentsQuery, where("collegeName", "==", searchCollege));
+      }
+      const querySnapshot = await getDocs(studentsQuery);
+
+      querySnapshot.forEach((doc) => {
+        const student = doc.data();
+        if (filterEvent && !student.events.includes(filterEvent)) return; // Skip if not matching event filter
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${student.registrationId}</td>
+          <td>${student.studentName}</td>
+          <td>${student.collegeName}</td>
+          <td>${student.events.map((e) => (e.event ? `${e.event} (${e.teamName || ""})` : e)).join(", ")}</td>
+          <td>
+            <select class="form-select fees-status" data-id="${doc.id}">
+              <option value="Unpaid" ${student.feesPaid === "Unpaid" ? "selected" : ""}>Unpaid</option>
+              <option value="Paid" ${student.feesPaid === "Paid" ? "selected" : ""}>Paid</option>
+            </select>
+          </td>
+          <td>
+            <select class="form-select payment-method" data-id="${doc.id}">
+              <option value="Cash" ${student.paymentMethod === "Cash" ? "selected" : ""}>Cash</option>
+              <option value="Online" ${student.paymentMethod === "Online" ? "selected" : ""}>Online</option>
+            </select>
+          </td>
+        `;
+        studentsTable.appendChild(row);
+      });
+    }
+
+    // Update fees and payment method in Firestore
+    document.addEventListener("change", async (e) => {
+      if (e.target.classList.contains("fees-status") || e.target.classList.contains("payment-method")) {
+        const docId = e.target.dataset.id;
+        const field = e.target.classList.contains("fees-status") ? "feesPaid" : "paymentMethod";
+        const value = e.target.value;
+
+        const studentDoc = doc(db, "registrations", docId);
+        await updateDoc(studentDoc, { [field]: value });
+        alert("Updated successfully!");
+      }
+    });
+
+    // Export table to Excel
+    document.getElementById("export-btn").addEventListener("click", () => {
+      const table = document.querySelector("table");
+      const tableHtml = table.outerHTML.replace(/ /g, "%20");
+      const filename = "registrations.xls";
+
+      const downloadLink = document.createElement("a");
+      downloadLink.href = "data:application/vnd.ms-excel," + tableHtml;
+      downloadLink.download = filename;
+      downloadLink.click();
+    });
+
+    // Search & Filter Events
+    document.getElementById("search-id").addEventListener("input", loadStudents);
+    document.getElementById("search-name").addEventListener("input", loadStudents);
+    document.getElementById("search-college").addEventListener("input", loadStudents);
+    document.getElementById("filter-event").addEventListener("change", loadStudents);
+
+    // Load students on page load
+    loadStudents();
+  </script>
+</body>
+</html>

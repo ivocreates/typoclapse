@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Event Coordinator - TechFest-SPK</title>
+  <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+  <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+  <script type="module" src="firebase-config.js"></script>
+</head>
+<body>
+  <div class="container mt-5">
+    <h1 class="text-center">Event Coordinator</h1>
+    <div class="mt-4">
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <select id="filter-event" class="form-select">
+            <option value="">Select Assigned Event</option>
+            <option value="BGMI">BGMI</option>
+            <option value="Mobile App Development">Mobile App Development</option>
+            <option value="Techventure Quest">Techventure Quest</option>
+            <option value="Hactivate: Capture the Flag">Hactivate: Capture the Flag</option>
+            <option value="Quiz Competition">Quiz Competition</option>
+            <option value="Web Development">Web Development</option>
+            <option value="Typoclapse">Typoclapse</option>
+            <option value="Reel Making">Reel Making</option>
+            <option value="MySQL Mastermind">MySQL Mastermind</option>
+          </select>
+        </div>
+        <div class="col-md-6 text-end">
+          <button id="export-btn" class="btn btn-success">Export to Excel</button>
+        </div>
+      </div>
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Registration ID</th>
+            <th>Student Name</th>
+            <th>College Name</th>
+            <th>Event</th>
+            <th>Attendance</th>
+          </tr>
+        </thead>
+        <tbody id="students-table">
+          <!-- Data will be dynamically loaded here -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js";
+    import { getFirestore, collection, query, where, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD55uYtn0ntgrC-iaO34ebEBGd_lvSO-9I",
+      authDomain: "my-porfolio-51864.firebaseapp.com",
+      databaseURL: "https://my-porfolio-51864-default-rtdb.firebaseio.com",
+      projectId: "my-porfolio-51864",
+      storageBucket: "my-porfolio-51864.firebasestorage.app",
+      messagingSenderId: "316880480532",
+      appId: "1:316880480532:web:b02ea850c907a5d3ae7a01",
+      measurementId: "G-9GVEZT7XWY"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Load data for selected event
+    async function loadStudents() {
+      const studentsTable = document.getElementById("students-table");
+      studentsTable.innerHTML = ""; // Clear the table
+
+      const filterEvent = document.getElementById("filter-event").value;
+
+      if (!filterEvent) {
+        alert("Please select an event to view students!");
+        return;
+      }
+
+      // Query students with feesPaid = 'Paid' and event = selected event
+      const studentsQuery = query(
+        collection(db, "registrations"),
+        where("feesPaid", "==", "Paid"),
+        where("events", "array-contains", filterEvent)
+      );
+
+      const querySnapshot = await getDocs(studentsQuery);
+
+      querySnapshot.forEach((doc) => {
+        const student = doc.data();
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${student.registrationId}</td>
+          <td>${student.studentName}</td>
+          <td>${student.collegeName}</td>
+          <td>${filterEvent}</td>
+          <td>
+            <select class="form-select attendance-status" data-id="${doc.id}">
+              <option value="Absent" ${student.attendance === "Absent" ? "selected" : ""}>Absent</option>
+              <option value="Present" ${student.attendance === "Present" ? "selected" : ""}>Present</option>
+            </select>
+          </td>
+        `;
+        studentsTable.appendChild(row);
+      });
+    }
+
+    // Update attendance in Firestore
+    document.addEventListener("change", async (e) => {
+      if (e.target.classList.contains("attendance-status")) {
+        const docId = e.target.dataset.id;
+        const attendance = e.target.value;
+
+        const studentDoc = doc(db, "registrations", docId);
+        await updateDoc(studentDoc, { attendance });
+        alert("Attendance updated successfully!");
+      }
+    });
+
+    // Export table to Excel
+    document.getElementById("export-btn").addEventListener("click", () => {
+      const table = document.querySelector("table");
+      const tableHtml = table.outerHTML.replace(/ /g, "%20");
+      const filename = "attendance.xls";
+
+      const downloadLink = document.createElement("a");
+      downloadLink.href = "data:application/vnd.ms-excel," + tableHtml;
+      downloadLink.download = filename;
+      downloadLink.click();
+    });
+
+    // Filter and load students
+    document.getElementById("filter-event").addEventListener("change", loadStudents);
+  </script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+[debug] [2025-01-28T05:31:57.111Z] ----------------------------------------------------------------------
+[debug] [2025-01-28T05:31:57.116Z] Command:       C:\Program Files\nodejs\node.exe C:\Program Files\nodejs\node_modules\firebase-tools\lib\bin\firebase.js init
+[debug] [2025-01-28T05:31:57.117Z] CLI Version:   13.29.2
+[debug] [2025-01-28T05:31:57.118Z] Platform:      win32
+[debug] [2025-01-28T05:31:57.118Z] Node Version:  v18.20.4
+[debug] [2025-01-28T05:31:57.121Z] Time:          Tue Jan 28 2025 11:01:57 GMT+0530 (India Standard Time)
+[debug] [2025-01-28T05:31:57.123Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-01-28T05:31:57.131Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[debug] [2025-01-28T05:31:57.229Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-01-28T05:31:57.231Z] > authorizing via signed-in user (ivopereiraix3@gmail.com)
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  D:\techfest-spk
+
+[debug] [2025-01-28T05:31:57.931Z] <<< [apiv2][status] GET https://firebase-public.firebaseio.com/cli.json 200
+[debug] [2025-01-28T05:31:57.932Z] <<< [apiv2][body] GET https://firebase-public.firebaseio.com/cli.json {"cloudBuildErrorAfter":1594252800000,"cloudBuildWarnAfter":1590019200000,"defaultNode10After":1594252800000,"minVersion":"3.0.5","node8DeploysDisabledAfter":1613390400000,"node8RuntimeDisabledAfter":1615809600000,"node8WarnAfter":1600128000000}
+[debug] [2025-04-12T08:59:11.575Z] ----------------------------------------------------------------------
+[debug] [2025-04-12T08:59:11.577Z] Command:       C:\Program Files\nodejs\node.exe C:\Program Files\nodejs\node_modules\firebase-tools\lib\bin\firebase.js init
+[debug] [2025-04-12T08:59:11.577Z] CLI Version:   13.34.0
+[debug] [2025-04-12T08:59:11.578Z] Platform:      win32
+[debug] [2025-04-12T08:59:11.578Z] Node Version:  v18.20.4
+[debug] [2025-04-12T08:59:11.579Z] Time:          Sat Apr 12 2025 14:29:11 GMT+0530 (India Standard Time)
+[debug] [2025-04-12T08:59:11.579Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-04-12T08:59:11.583Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[debug] [2025-04-12T08:59:11.619Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-04-12T08:59:11.619Z] > authorizing via signed-in user (ivopereiraix3@gmail.com)
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  D:\techfest-spk
+
+[debug] [2025-04-12T08:59:12.349Z] <<< [apiv2][status] GET https://firebase-public.firebaseio.com/cli.json 200
+[debug] [2025-04-12T08:59:12.350Z] <<< [apiv2][body] GET https://firebase-public.firebaseio.com/cli.json {"cloudBuildErrorAfter":1594252800000,"cloudBuildWarnAfter":1590019200000,"defaultNode10After":1594252800000,"minVersion":"3.0.5","node8DeploysDisabledAfter":1613390400000,"node8RuntimeDisabledAfter":1615809600000,"node8WarnAfter":1600128000000}

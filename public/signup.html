@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css">
+</head>
+<body>
+  <div class="container mt-5">
+    <h2 class="text-center">Sign-Up</h2>
+    <form id="signup-form">
+      <div class="mb-3">
+        <label for="name" class="form-label">Name</label>
+        <input type="text" id="name" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" id="email" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input type="password" id="password" class="form-control" required>
+      </div>
+
+      <!-- Role selection -->
+      <div class="mb-3">
+        <label for="role" class="form-label">Role</label>
+        <select id="role" class="form-control" required>
+          <option value="admin">Admin</option>
+          <option value="coordinator">Event Coordinator</option>
+          <option value="registration_authority">Registration Authority</option>
+          <option value="head_registration">Head Registration</option>
+        </select>
+      </div>
+
+      <!-- Event selection (only for coordinators and other participants) -->
+      <div class="mb-3" id="event-selection" style="display: none;">
+        <label for="event" class="form-label">Event</label>
+        <select id="event" class="form-control">
+          <option value="bgmi">BGMI</option>
+          <option value="mobile_app_dev">Mobile App Development</option>
+          <option value="techventure_quest">Techventure Quest</option>
+          <option value="hactivate_ctf">Hactivate: Capture the Flag</option>
+          <option value="quiz_competition">Quiz Competition</option>
+          <option value="web_dev">Web Development</option>
+          <option value="typoclapse">Typoclapse</option>
+          <option value="reel_making">Reel Making</option>
+          <option value="mysql_mastermind">MySQL Mastermind</option>
+        </select>
+      </div>
+
+      <!-- BGMI Team Name input -->
+      <div class="mb-3" id="team-name-input" style="display: none;">
+        <label for="team-name" class="form-label">Team Name (If Interested in BGMI)</label>
+        <input type="text" id="team-name" class="form-control">
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100">Sign Up</button>
+    </form>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js";
+    import { getFirestore, setDoc, doc } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js";
+
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyD55uYtn0ntgrC-iaO34ebEBGd_lvSO-9I",
+      authDomain: "my-porfolio-51864.firebaseapp.com",
+      databaseURL: "https://my-porfolio-51864-default-rtdb.firebaseio.com",
+      projectId: "my-porfolio-51864",
+      storageBucket: "my-porfolio-51864.appspot.com",
+      messagingSenderId: "316880480532",
+      appId: "1:316880480532:web:b02ea850c907a5d3ae7a01",
+      measurementId: "G-9GVEZT7XWY"
+    };
+
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Handle sign-up form submission
+    document.getElementById("signup-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const role = document.getElementById("role").value;
+      const event = document.getElementById("event").value;
+      const teamName = document.getElementById("team-name").value;
+
+      try {
+        // Create a new user
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        // Save user role and event participation in Firestore
+        await setDoc(doc(db, "users", user.uid), {
+          name,
+          email,
+          role,
+          event: role === "coordinator" || role === "head_registration" ? event : null,
+          teamName: role === "coordinator" && event === "bgmi" ? teamName : null
+        });
+
+        console.log("User signed up successfully:", user);
+        alert("Account created successfully!");
+
+        // Redirect after sign-up
+        window.location.href = "admin-dashboard.html"; // Or to respective pages for different roles
+
+      } catch (error) {
+        console.error("Error during sign up:", error);
+        alert("Error: " + error.message);
+      }
+    });
+
+    // Show event and team name input based on role selection
+    document.getElementById("role").addEventListener("change", function() {
+      const role = this.value;
+      const eventSelection = document.getElementById("event-selection");
+      const teamNameInput = document.getElementById("team-name-input");
+
+      if (role === "coordinator" || role === "head_registration") {
+        eventSelection.style.display = "block";
+      } else {
+        eventSelection.style.display = "none";
+      }
+
+      if (role === "coordinator" && document.getElementById("event").value === "bgmi") {
+        teamNameInput.style.display = "block";
+      } else {
+        teamNameInput.style.display = "none";
+      }
+    });
+
+    // Show team name input when BGMI event is selected
+    document.getElementById("event").addEventListener("change", function() {
+      const event = this.value;
+      const teamNameInput = document.getElementById("team-name-input");
+
+      if (event === "bgmi") {
+        teamNameInput.style.display = "block";
+      } else {
+        teamNameInput.style.display = "none";
+      }
+    });
+  </script>
+</body>
+</html>
